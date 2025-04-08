@@ -1,0 +1,73 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Produtos</h2>
+
+  <button class="btn btn-primary mb-2 me-2" (click)="openProductModal()">Cadastrar Produto</button>
+  <button class="btn btn-success mb-2" (click)="openInvoiceModal()">Criar Nota Fiscal</button>
+
+  <table class="table table-striped">
+    <thead class="table-primary">
+      <tr>
+        <th>Nome</th>
+        <th>Preço</th>
+        <th>Estoque</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products">
+        <td>{{ product.name }}</td>
+        <td>R$ {{ product.price | number: '1.2-2' }}</td>
+        <td>{{ product.stock }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="container mt-4">
+  <h2 class="mb-3">Notas Fiscais Criadas</h2>
+
+  <table *ngIf="invoices && invoices.length > 0" class="table table-striped">
+    <thead class="table-primary">
+      <tr>
+        <th>#</th>
+        <th>Produtos</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Imprimir</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let invoice of invoices; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>
+          <ul class="list-unstyled mb-0">
+            <li *ngFor="let item of invoice.products">
+              {{ item.product.name }} (x{{ item.quantity }}) –
+              R$ {{ item.product.price * item.quantity | number: '1.2-2' }}
+            </li>
+          </ul>
+        </td>
+        <td class="fw-bold text-success">
+          R$ {{ getInvoiceTotal(invoice) | number: '1.2-2' }}
+        </td>
+        <td class="fw-bold text-success">
+          {{ invoice.status }}
+        </td>
+        <td>
+          <button class="btn btn-outline-secondary btn-sm"
+                  (click)="invoice.id && printInvoice(invoice.id)"
+                  [disabled]="!invoice.id"
+                  title="Imprimir Nota Fiscal">
+            🖨️ Imprimir
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!invoices || invoices.length === 0" class="text-center text-muted fst-italic mt-3">
+    Nenhuma nota fiscal criada até o momento.
+  </div>
+</div>
+
+<app-product-form #productModal (productSaved)="addProduct($event)"></app-product-form>
+<app-invoice-form #invoiceModal [products]="products" (invoiceSaved)="onInvoiceSaved($event)"></app-invoice-form>
