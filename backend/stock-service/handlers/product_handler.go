@@ -125,7 +125,12 @@ func UpdateStock(c *gin.Context) {
 		return
 	}
 
-	err = repository.UpdateStock(id, body.Quantity)
+	product := &models.Product{
+		ID:    uint(id),
+		Stock: body.Quantity,
+	}
+
+	err = repository.UpdateStock(product)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update stock"})
 		return
