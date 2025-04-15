@@ -3,10 +3,10 @@ package models
 import "time"
 
 type Product struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Price     float64   `json:"price"`
-	Stock     int       `json:"stock"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name      string    `gorm:"type=varchar(255);not null" json:"name"`
+	Price     float64   `gorm:"not null" json:"price"`
+	Stock     int       `gorm:"not null" json:"stock"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
