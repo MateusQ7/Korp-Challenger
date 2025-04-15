@@ -11,8 +11,8 @@ import (
 
 func main() {
 
-	db := database.Connect()
-	database.RunMigrations(db)
+	database.Connect()
+	database.RunMigrations(database.RawDB())
 
 	r := gin.Default()
 

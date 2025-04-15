@@ -5,22 +5,41 @@ import (
 	"fmt"
 	"log"
 
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+var (
+	DB    *gorm.DB
+	rawDB *sql.DB
+)
 
-func Connect() *sql.DB {
+func RawDB() *sql.DB {
+	return rawDB
+}
+
+func Connect() {
+	dsn := "user=postgres password=admin dbname=stock_service sslmode=disable"
+
 	var err error
-	DB, err = sql.Open("postgres", "user=postgres password=admin dbname=stock_service sslmode=disable")
+
+	rawDB, err = sql.Open("postgres", dsn)
 	if err != nil {
-		log.Fatal("Error while connecting to the database:", err)
+		log.Fatal("Error connecting (raw) to DB:", err)
+	}
+	if err = rawDB.Ping(); err != nil {
+		log.Fatal("Error pinging DB:", err)
 	}
 
-	if err := DB.Ping(); err != nil {
-		log.Fatal("Error pinging the database:", err)
+	fmt.Println("Connected (raw) to database.")
+
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("Error connecting (gorm) to DB:", err)
 	}
 
-	fmt.Println("Connected to the database successfully!")
-	return DB
+	fmt.Println("Connected (gorm) to database.")
 }
